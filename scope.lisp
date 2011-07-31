@@ -62,12 +62,14 @@
 #+nil
 (subseq (second *points*) 0 100)
 
+(defparameter *count* 0)
+
 (let ((count 0))
  (defun draw-screen ()
    (enable :blend)
    (blend-func :src-alpha :one-minus-src-alpha)
-   (color 1 1 1 .1)
-   (point-size 3)
+
+   (point-size 1.8)
    (clear :color-buffer-bit)
    (let ((sx .009)
 	 (sy .009)
@@ -75,14 +77,18 @@
     (destructuring-bind (left right) *points*
       (translate 400 300 0)
       (scale sx (- sy) 1)
-      (incf count n)
+      (incf *count* n)
       (with-primitive :points
-	(unless (< (+ count n) (min (length left)
-				    (length right)))
-	  (setf count 0))
-	(dotimes (j n)
-	  (vertex (aref right (+ count j)) 
-		  (aref left (+ count j)))))))))
+	(unless (< (+ (+ 11 *count*) n) (min (length left)
+					     (length right)))
+	  (setf *count* 0))
+	(let ((nk 10))
+	 (dotimes (k nk)
+	   (color 1 1 1 (expt (* k (/ 1s0 nk))
+			      5.2))
+	   (dotimes (j n)
+	     (vertex (aref right (+ *count* (* n k) j)) 
+		     (aref left (+ *count* (* n k) j)))))))))))
 ;; 60 Hz framerate
 ;; 48000 Hz 
 
